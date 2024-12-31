@@ -125,7 +125,7 @@ def get_price_data(release_id):
 
         return min_price, max_price, avg_price
 
-    except Exception as e:
+    except Exception:
         print("Error fetching prices...")
         return 0, 0, 0
 
