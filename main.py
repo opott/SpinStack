@@ -1,4 +1,5 @@
 import os
+import platform
 from pyairtable import Api
 from pyairtable.formulas import match
 import discogs_client
@@ -17,8 +18,14 @@ table = api.table(os.getenv('BASE_ID'), os.getenv('TABLE_ID'))
 discogs = discogs_client.Client('SpinStack/0.1',
                                 user_token=os.getenv('DISCOGS_TOKEN'))
 
+def clear_console():
+    if platform.system() == "Windows":
+        os.system("cls")
+    else:
+        os.system("clear")
 
 def main():
+    clear_console()
     print('Welcome to SpinStack!')
     print('Please select an option:')
     print('1. Add a new entry')
@@ -64,7 +71,9 @@ def get_price_data(release_id):
 
 
 def create_entry():
+    clear_console()
     catalog_number = str(input('Enter catalog number: ')).upper()
+    clear_console()
     print('Searching for release...')
     results = discogs.search(catno=catalog_number).page(1)
     current = results[0]
@@ -76,10 +85,12 @@ def create_entry():
     correct = str(input('Is this correct? (y/n): ')).lower()
 
     if correct == 'y':
+        clear_console()
         print('Fetching price data...')
         print('A browser window will open to fetch the data. Please wait...')
         sleep(1)
         min_price, max_price, avg_price = get_price_data(release_id)
+        clear_console()
         print('Price data fetched!')
         print(f'Min: £{min_price}, Max: £{max_price}, Average: £{avg_price}')
         sleep(1)
@@ -94,10 +105,12 @@ def create_entry():
         })
         print('Entry created!')
     elif correct == 'n':
+        clear_console()
         print('Let\'s try again...')
         catalog_number = str(input('Enter catalog number: ')).upper()
         title_search = str(input('Enter album title: '))
         artist_search = str(input('Enter artist name: '))
+        clear_console()
         print('Searching for release...')
         results = discogs.search(catno=catalog_number,
                                  title=title_search,
@@ -110,11 +123,13 @@ def create_entry():
         print(f'{title} by {artist}')
         correct = str(input('Is this correct? (y/n): ')).lower()
         if correct == 'y':
+            clear_console()
             print('Fetching price data...')
             print(
                 'A browser window will open to fetch the data. Please wait...')
             sleep(1)
             min_price, max_price, avg_price = get_price_data(release_id)
+            clear_console()
             print('Price data fetched!')
             print(
                 f'Min: £{min_price}, Max: £{max_price}, Average: £{avg_price}')
@@ -130,6 +145,7 @@ def create_entry():
             })
             print('Entry created!')
         elif correct == 'n':
+            clear_console()
             print(
                 'Sorry, I couldn\'t find the release. You may need to add it manually.'
             )
@@ -141,12 +157,12 @@ def create_entry():
         create_entry()
 
 
-again = input('Would you like to add another entry? (y/n): ').lower()
-if again == 'y':
-    create_entry()
-else:
-    print('Returning to main menu...')
-    sleep(2)
-    main()
+    again = input('Would you like to add another entry? (y/n): ').lower()
+    if again == 'y':
+        create_entry()
+    else:
+        print('Returning to main menu...')
+        sleep(2)
+        main()
 
 main()
