@@ -1,0 +1,6 @@
+pyairtable
+dotenv
+discogs_client
+selenium
+webdriver_manager
+time
