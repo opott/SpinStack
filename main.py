@@ -29,14 +29,47 @@ def main():
     print('Welcome to SpinStack!')
     print('Please select an option:')
     print('1. Add a new entry')
+    print('2. Fetch an existing entry')
 
     option = int(input('Enter option number: '))
     if option == 1:
         create_entry()
+    elif option == 2:
+        fetch_entry()
     else:
         print('Invalid input. Please try again.')
         main()
 
+def fetch_entry():
+    clear_console()
+    catalog_number = str(input('Enter catalog number: ')).upper()
+    clear_console()
+    print('Searching for entry...')
+    search_formula = match({'Catalog Number': catalog_number})
+    results = table.all(formula=search_formula)
+    if not results:
+        print('Entry not found.')
+    else:
+        clear_console()
+        for result in results:
+            min_price = str(result['fields']['Min Price'])
+            avg_price = str(result['fields']['Avg Price'])
+            max_price = str(result['fields']['Max Price'])
+            print('Catalog Number: ' + result['fields']['Catalog Number'])
+            print('Album Name: ' + result['fields']['Album Name'])
+            print('Artist Name: ' + result['fields']['Artist Name'])
+            print('Min Price: £' + min_price)
+            print('Avg Price: £' + avg_price)
+            print('Max Price: £' + max_price)
+            print('---------------------------------')
+            sleep(3)
+    again = input('Would you like to fetch another entry? (y/n): ').lower()
+    if again == 'y':
+        fetch_entry()
+    else:
+        print('Returning to main menu...')
+        sleep(2)
+        main()
 
 def get_price_data(release_id):
     url = f'https://www.discogs.com/sell/release/{release_id}'
