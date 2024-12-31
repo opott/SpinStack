@@ -34,6 +34,7 @@ def main():
     print('2. Fetch an existing entry')
     print('3. Edit an existing entry')
     print('4. Delete an existing entry')
+    print('5. Update price data')
 
     option = int(input('Enter option number: '))
     if option == 1:
@@ -44,6 +45,8 @@ def main():
         edit_entry()
     elif option == 4:
         delete_entry()
+    elif option == 5:
+        update_price_data()
     else:
         print('Invalid input. Please try again.')
         main()
@@ -85,32 +88,35 @@ def get_price_data(release_id):
     url = f'https://www.discogs.com/sell/release/{release_id}'
 
     options = webdriver.ChromeOptions()
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()),
-                              options=options)
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
     try:
         driver.get(url)
         sleep(3)
 
-        price_elements = driver.find_elements(
-            By.CSS_SELECTOR, 'span.price[data-currency="GBP"]')
+        price_elements = driver.find_elements(By.CSS_SELECTOR, 'span.price[data-currency="GBP"]')
 
-        prices = []
-        for price_element in price_elements:
-            price_value = price_element.get_attribute('data-pricevalue')
-            prices.append(price_value)
+        prices = [float(price_element.get_attribute('data-pricevalue')) for price_element in price_elements]
 
-        prices = [float(price) for price in prices]
+        if not prices:
+            print('No prices found.')
+            return 0, 0, 0
 
-        max_price = float(max(prices))
-        min_price = float(min(prices))
-        avg_price = round(sum(prices) / len(prices), 2)
+        min_price = float(min(prices)) if prices else 0
+        max_price = float(max(prices)) if prices else 0
+        avg_price = round(sum(prices) / len(prices), 2) if prices else 0
+
+        if len(set(prices)) == 1:
+            max_price = min_price
+
+        return min_price, max_price, avg_price
 
     except Exception as e:
-        print(f"Error: {e}")
+        print('Error fetching prices...')
+        return 0, 0, 0
+
     finally:
         driver.quit()
-        return min_price, max_price, avg_price
 
 
 def create_entry():
@@ -144,7 +150,10 @@ def create_entry():
             'Artist Name': artist,
             'Max Price': max_price,
             'Avg Price': avg_price,
-            'Min Price': min_price
+            'Min Price': min_price,
+            'Discogs Release ID': release_id,
+            'Discogs Release URL': f'https://www.discogs.com/release/{release_id}'
+
         })
         print('Entry created!')
     elif correct == 'n':
@@ -333,6 +342,30 @@ def delete_entry():
             print('Returning to main menu...')
             sleep(2)
             main()
+
+def update_price_data():
+    clear_console()
+    print('This may take a while...')
+    confirm = str(input('Are you sure you want to update the price data? (y/n): ')).lower()
+    if confirm == 'y':
+        entries = table.all()
+        for entry in entries:
+            release_id = entry['fields']['Discogs Release ID']
+            print(f'Updating price data for {entry["fields"]["Album Name"]}...')
+            min_price, max_price, avg_price = get_price_data(release_id)
+            table.update(entry['id'], {
+                'Max Price': max_price,
+                'Avg Price': avg_price,
+                'Min Price': min_price
+            })
+        print('Price data updated!')
+        print('Returning to main menu...')
+        sleep(2)
+        main()
+    else:
+        print('Returning to main menu...')
+        sleep(2)
+        main()
 
 
 main()
