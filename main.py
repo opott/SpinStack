@@ -96,15 +96,20 @@ def get_price_data(release_id):
     url = f'https://www.discogs.com/sell/release/{release_id}'
 
     options = webdriver.ChromeOptions()
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()),
+                              options=options)
 
     try:
         driver.get(url)
         sleep(3)
 
-        price_elements = driver.find_elements(By.CSS_SELECTOR, 'span.price[data-currency="GBP"]')
+        price_elements = driver.find_elements(
+            By.CSS_SELECTOR, 'span.price[data-currency="GBP"]')
 
-        prices = [float(price_element.get_attribute('data-pricevalue')) for price_element in price_elements]
+        prices = [
+            float(price_element.get_attribute('data-pricevalue'))
+            for price_element in price_elements
+        ]
 
         if not prices:
             print('No prices found.')
@@ -153,15 +158,22 @@ def create_entry():
         sleep(1)
         print('Creating entry...')
         table.create({
-            'Catalog Number': catalog_number,
-            'Album Name': title,
-            'Artist Name': artist,
-            'Max Price': max_price,
-            'Avg Price': avg_price,
-            'Min Price': min_price,
-            'Discogs Release ID': release_id,
-            'Discogs Release URL': f'https://www.discogs.com/release/{release_id}'
-
+            'Catalog Number':
+            catalog_number,
+            'Album Name':
+            title,
+            'Artist Name':
+            artist,
+            'Max Price':
+            max_price,
+            'Avg Price':
+            avg_price,
+            'Min Price':
+            min_price,
+            'Discogs Release ID':
+            release_id,
+            'Discogs Release URL':
+            f'https://www.discogs.com/release/{release_id}'
         })
         print('Entry created!')
     elif correct == 'n':
@@ -224,6 +236,7 @@ def create_entry():
         sleep(2)
         main()
 
+
 def edit_entry():
     clear_console()
     catalog_number = str(input('Enter catalog number: ')).upper()
@@ -261,6 +274,7 @@ def edit_entry():
             print('Returning to main menu...')
             sleep(2)
             main()
+
 
 def edit_field(entry_id):
     clear_console()
@@ -311,6 +325,7 @@ def edit_field(entry_id):
         table.update(entry_id, {'Max Price': max_price})
         print('Entry updated!')
 
+
 def delete_entry():
     clear_console()
     catalog_number = str(input('Enter catalog number: ')).upper()
@@ -348,21 +363,26 @@ def delete_entry():
             sleep(2)
             main()
 
+
 def update_price_data():
     clear_console()
     print('This may take a while...')
-    confirm = str(input('Are you sure you want to update the price data? (y/n): ')).lower()
+    confirm = str(
+        input('Are you sure you want to update the price data? (y/n): ')
+    ).lower()
     if confirm == 'y':
         records = table.all()
         for record in records:
             release_id = record['fields']['Discogs Release ID']
-            print(f'Updating price data for {record["fields"]["Album Name"]}...')
+            print(
+                f'Updating price data for {record["fields"]["Album Name"]}...')
             min_price, max_price, avg_price = get_price_data(release_id)
-            table.update(record['id'], {
-                'Max Price': max_price,
-                'Avg Price': avg_price,
-                'Min Price': min_price
-            })
+            table.update(
+                record['id'], {
+                    'Max Price': max_price,
+                    'Avg Price': avg_price,
+                    'Min Price': min_price
+                })
         print('Price data updated!')
         print('Returning to main menu...')
         sleep(2)
@@ -371,6 +391,7 @@ def update_price_data():
         print('Returning to main menu...')
         sleep(2)
         main()
+
 
 def create_manual_entry():
     clear_console()
@@ -389,19 +410,27 @@ def create_manual_entry():
     sleep(1)
     print('Creating entry...')
     table.create({
-        'Catalog Number': catalog_number,
-        'Album Name': title,
-        'Artist Name': artist,
-        'Max Price': max_price,
-        'Avg Price': avg_price,
-        'Min Price': min_price,
-        'Discogs Release ID': release_id,
-        'Discogs Release URL': f'https://www.discogs.com/release/{release_id}'
+        'Catalog Number':
+        catalog_number,
+        'Album Name':
+        title,
+        'Artist Name':
+        artist,
+        'Max Price':
+        max_price,
+        'Avg Price':
+        avg_price,
+        'Min Price':
+        min_price,
+        'Discogs Release ID':
+        release_id,
+        'Discogs Release URL':
+        f'https://www.discogs.com/release/{release_id}'
     })
     print('Entry created!')
     print('Returning to main menu...')
     sleep(2)
     main()
-    
+
 
 main()
