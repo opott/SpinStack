@@ -1,6 +1,9 @@
 version = 1
 
 [[analyzers]]
+name = "secrets"
+
+[[analyzers]]
 name = "python"
 
   [analyzers.meta]
@@ -11,3 +14,6 @@ name = "yapf"
 
 [[transformers]]
 name = "ruff"
+
+[[transformers]]
+name = "isort"
