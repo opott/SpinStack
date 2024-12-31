@@ -5,15 +5,16 @@ currency_symbol = "£"
 
 import os
 import platform
-from pyairtable import Api
-from pyairtable.formulas import match
+from time import sleep
+
 import discogs_client
 from dotenv import load_dotenv
+from pyairtable import Api
+from pyairtable.formulas import match
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
-from time import sleep
 
 load_dotenv()
 
