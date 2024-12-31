@@ -1,3 +1,8 @@
+# SETTINGS
+currency_code = 'GBP'
+currency_symbol = '£'
+# END OF SETTINGS
+
 import os
 import platform
 from pyairtable import Api
