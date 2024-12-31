@@ -28,3 +28,6 @@ I welcome all reasonable contributions! Please feel free to open a Pull Request.
 
 ## License
 Licensed under the GNU General Public License 3.0.
+
+## Additional Note
+The price scraping feature was created with the assistance of ChatGPT.
