@@ -40,6 +40,7 @@ def main():
     print('3. Edit an existing entry')
     print('4. Delete an existing entry')
     print('5. Update price data')
+    print('6. Add a manual entry')
 
     option = int(input('Enter option number: '))
     if option == 1:
@@ -52,6 +53,8 @@ def main():
         delete_entry()
     elif option == 5:
         update_price_data()
+    elif option == 6:
+        create_manual_entry()
     else:
         print('Invalid input. Please try again.')
         main()
@@ -221,7 +224,6 @@ def create_entry():
         sleep(2)
         main()
 
-
 def edit_entry():
     clear_console()
     catalog_number = str(input('Enter catalog number: ')).upper()
@@ -259,7 +261,6 @@ def edit_entry():
             print('Returning to main menu...')
             sleep(2)
             main()
-
 
 def edit_field(entry_id):
     clear_console()
@@ -310,7 +311,6 @@ def edit_field(entry_id):
         table.update(entry_id, {'Max Price': max_price})
         print('Entry updated!')
 
-
 def delete_entry():
     clear_console()
     catalog_number = str(input('Enter catalog number: ')).upper()
@@ -353,12 +353,12 @@ def update_price_data():
     print('This may take a while...')
     confirm = str(input('Are you sure you want to update the price data? (y/n): ')).lower()
     if confirm == 'y':
-        entries = table.all()
-        for entry in entries:
-            release_id = entry['fields']['Discogs Release ID']
-            print(f'Updating price data for {entry["fields"]["Album Name"]}...')
+        records = table.all()
+        for record in records:
+            release_id = record['fields']['Discogs Release ID']
+            print(f'Updating price data for {record["fields"]["Album Name"]}...')
             min_price, max_price, avg_price = get_price_data(release_id)
-            table.update(entry['id'], {
+            table.update(record['id'], {
                 'Max Price': max_price,
                 'Avg Price': avg_price,
                 'Min Price': min_price
@@ -372,5 +372,36 @@ def update_price_data():
         sleep(2)
         main()
 
+def create_manual_entry():
+    clear_console()
+    catalog_number = str(input('Enter catalog number: ')).upper()
+    title = str(input('Enter album title: '))
+    artist = str(input('Enter artist name: '))
+    release_id = int(input('Enter Discogs release ID: '))
+    clear_console()
+    print('Fetching price data...')
+    print('A browser window will open to fetch the data. Please wait...')
+    sleep(1)
+    min_price, max_price, avg_price = get_price_data(release_id)
+    clear_console()
+    print('Price data fetched!')
+    print(f'Min: £{min_price}, Max: £{max_price}, Average: £{avg_price}')
+    sleep(1)
+    print('Creating entry...')
+    table.create({
+        'Catalog Number': catalog_number,
+        'Album Name': title,
+        'Artist Name': artist,
+        'Max Price': max_price,
+        'Avg Price': avg_price,
+        'Min Price': min_price,
+        'Discogs Release ID': release_id,
+        'Discogs Release URL': f'https://www.discogs.com/release/{release_id}'
+    })
+    print('Entry created!')
+    print('Returning to main menu...')
+    sleep(2)
+    main()
+    
 
 main()
