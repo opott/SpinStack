@@ -18,11 +18,13 @@ table = api.table(os.getenv('BASE_ID'), os.getenv('TABLE_ID'))
 discogs = discogs_client.Client('SpinStack/0.1',
                                 user_token=os.getenv('DISCOGS_TOKEN'))
 
+
 def clear_console():
     if platform.system() == "Windows":
         os.system("cls")
     else:
         os.system("clear")
+
 
 def main():
     clear_console()
@@ -31,6 +33,7 @@ def main():
     print('1. Add a new entry')
     print('2. Fetch an existing entry')
     print('3. Edit an existing entry')
+    print('4. Delete an existing entry')
 
     option = int(input('Enter option number: '))
     if option == 1:
@@ -39,9 +42,12 @@ def main():
         fetch_entry()
     elif option == 3:
         edit_entry()
+    elif option == 4:
+        delete_entry()
     else:
         print('Invalid input. Please try again.')
         main()
+
 
 def fetch_entry():
     clear_console()
@@ -73,6 +79,7 @@ def fetch_entry():
         print('Returning to main menu...')
         sleep(2)
         main()
+
 
 def get_price_data(release_id):
     url = f'https://www.discogs.com/sell/release/{release_id}'
@@ -192,7 +199,6 @@ def create_entry():
         print('Invalid input. Please try again.')
         create_entry()
 
-
     again = input('Would you like to add another entry? (y/n): ').lower()
     if again == 'y':
         create_entry()
@@ -200,6 +206,7 @@ def create_entry():
         print('Returning to main menu...')
         sleep(2)
         main()
+
 
 def edit_entry():
     clear_console()
@@ -226,7 +233,8 @@ def edit_entry():
         edit = input('Would you like to edit this entry? (y/n): ').lower()
         if edit == 'y':
             edit_field(entry_id)
-            another_field = input('Would you like to edit another field? (y/n): ').lower()
+            another_field = input(
+                'Would you like to edit another field? (y/n): ').lower()
             if another_field == 'y':
                 edit_field(entry_id)
             else:
@@ -237,6 +245,7 @@ def edit_entry():
             print('Returning to main menu...')
             sleep(2)
             main()
+
 
 def edit_field(entry_id):
     clear_console()
@@ -267,22 +276,63 @@ def edit_field(entry_id):
         table.update(entry_id, {'Artist Name': artist_name})
         print('Entry updated!')
     elif field == 4:
-        min_price = float(input('Enter new min price, excluding currency symbol: '))
+        min_price = float(
+            input('Enter new min price, excluding currency symbol: '))
         clear_console()
         print('Updating entry...')
         table.update(entry_id, {'Min Price': min_price})
     elif field == 5:
-        avg_price = float(input('Enter new avg price, excluding currency symbol: '))
+        avg_price = float(
+            input('Enter new avg price, excluding currency symbol: '))
         clear_console()
         print('Updating entry...')
         table.update(entry_id, {'Avg Price': avg_price})
         print('Entry updated!')
     elif field == 6:
-        max_price = float(input('Enter new max price, excluding currency symbol: '))
+        max_price = float(
+            input('Enter new max price, excluding currency symbol: '))
         clear_console()
         print('Updating entry...')
         table.update(entry_id, {'Max Price': max_price})
         print('Entry updated!')
+
+
+def delete_entry():
+    clear_console()
+    catalog_number = str(input('Enter catalog number: ')).upper()
+    clear_console()
+    print('Searching for entry...')
+    search_formula = match({'Catalog Number': catalog_number})
+    results = table.all(formula=search_formula)
+    if not results:
+        print('Entry not found.')
+    else:
+        clear_console()
+        result = results[0]
+        entry_id = result['id']
+        min_price = str(result['fields']['Min Price'])
+        avg_price = str(result['fields']['Avg Price'])
+        max_price = str(result['fields']['Max Price'])
+        print('Catalog Number: ' + result['fields']['Catalog Number'])
+        print('Album Name: ' + result['fields']['Album Name'])
+        print('Artist Name: ' + result['fields']['Artist Name'])
+        print('Min Price: £' + min_price)
+        print('Avg Price: £' + avg_price)
+        print('Max Price: £' + max_price)
+        delete = input('Would you like to delete this entry? (y/n): ').lower()
+        if delete == 'y':
+            clear_console()
+            print('Deleting entry...')
+            table.delete(entry_id)
+            print('Entry deleted!')
+            sleep(2)
+            print('Returning to main menu...')
+            main()
+        else:
+            print('Canceling deletion...')
+            print('Returning to main menu...')
+            sleep(2)
+            main()
 
 
 main()
