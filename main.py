@@ -30,12 +30,15 @@ def main():
     print('Please select an option:')
     print('1. Add a new entry')
     print('2. Fetch an existing entry')
+    print('3. Edit an existing entry')
 
     option = int(input('Enter option number: '))
     if option == 1:
         create_entry()
     elif option == 2:
         fetch_entry()
+    elif option == 3:
+        edit_entry()
     else:
         print('Invalid input. Please try again.')
         main()
@@ -197,5 +200,89 @@ def create_entry():
         print('Returning to main menu...')
         sleep(2)
         main()
+
+def edit_entry():
+    clear_console()
+    catalog_number = str(input('Enter catalog number: ')).upper()
+    clear_console()
+    print('Searching for entry...')
+    search_formula = match({'Catalog Number': catalog_number})
+    results = table.all(formula=search_formula)
+    if not results:
+        print('Entry not found.')
+    else:
+        clear_console()
+        result = results[0]
+        entry_id = result['id']
+        min_price = str(result['fields']['Min Price'])
+        avg_price = str(result['fields']['Avg Price'])
+        max_price = str(result['fields']['Max Price'])
+        print('Catalog Number: ' + result['fields']['Catalog Number'])
+        print('Album Name: ' + result['fields']['Album Name'])
+        print('Artist Name: ' + result['fields']['Artist Name'])
+        print('Min Price: £' + min_price)
+        print('Avg Price: £' + avg_price)
+        print('Max Price: £' + max_price)
+        edit = input('Would you like to edit this entry? (y/n): ').lower()
+        if edit == 'y':
+            edit_field(entry_id)
+            another_field = input('Would you like to edit another field? (y/n): ').lower()
+            if another_field == 'y':
+                edit_field(entry_id)
+            else:
+                print('Returning to main menu...')
+                sleep(2)
+                main()
+        else:
+            print('Returning to main menu...')
+            sleep(2)
+            main()
+
+def edit_field(entry_id):
+    clear_console()
+    print('Select a field to edit:')
+    print('1. Catalog Number')
+    print('2. Album Name')
+    print('3. Artist Name')
+    print('4. Min Price')
+    print('5. Avg Price')
+    print('6. Max Price')
+    field = int(input('Enter field number: '))
+    if field == 1:
+        catalog_number = str(input('Enter new catalog number: ')).upper()
+        clear_console()
+        print('Updating entry...')
+        table.update(entry_id, {'Catalog Number': catalog_number})
+        print('Entry updated!')
+    elif field == 2:
+        album_name = str(input('Enter new album name: '))
+        clear_console()
+        print('Updating entry...')
+        table.update(entry_id, {'Album Name': album_name})
+        print('Entry updated!')
+    elif field == 3:
+        artist_name = str(input('Enter new artist name: '))
+        clear_console()
+        print('Updating entry...')
+        table.update(entry_id, {'Artist Name': artist_name})
+        print('Entry updated!')
+    elif field == 4:
+        min_price = float(input('Enter new min price, excluding currency symbol: '))
+        clear_console()
+        print('Updating entry...')
+        table.update(entry_id, {'Min Price': min_price})
+    elif field == 5:
+        avg_price = float(input('Enter new avg price, excluding currency symbol: '))
+        clear_console()
+        print('Updating entry...')
+        table.update(entry_id, {'Avg Price': avg_price})
+        print('Entry updated!')
+    elif field == 6:
+        max_price = float(input('Enter new max price, excluding currency symbol: '))
+        clear_console()
+        print('Updating entry...')
+        table.update(entry_id, {'Max Price': max_price})
+        print('Entry updated!')
+
 
 main()
